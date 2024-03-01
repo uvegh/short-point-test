@@ -1,112 +1,259 @@
+"use client"
 import Image from "next/image";
+import _ from "lodash"
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [itemStore,setItemStore]=useState<Task[]>()
+  const [editMode,setEditMode]=useState<boolean>(true)
+  
+  const [id,setId]=useState<number|null>()
+  const [taskName,setTaskName]=useState<string|"">("")
+  type Task={
+    id:number,
+    name:string,
+    status:string
+  }
+  let tasks:Task[] = [
+    {
+      id: 1,
+      name: "Training at the gym",
+      status: "incomplete",
+    }
+    // {
+    //   id: 2,
+    //   name: "Training at the gym",
+    //   status: "incomplete",
+    // },
+
+    // {
+    //   id: 3,
+    //   name: "Training at the gym",
+    //   status: "incomplete",
+    // },
+  ];
+
+
+ 
+
+  
+
+const updateTaskStat=(id:number)=>{
+  tasks=  _.map(tasks, (task) => {
+    if (task.id === id) {
+      if(task?.status=="incomplete"){
+console.log(task)
+
+      return { ...task, status: "complete" };
+      }
+   
+      console.log(task)
+      return { ...task, status: "incomplete" };
+    }
+    console.log(task)
+    return task;
+  });
+  localStorage.setItem("itemsStore",JSON.stringify(tasks)) 
+}
+
+const updateTask=(id:number)=>{
+  
+  tasks=  _.map(tasks, (task) => {
+    if (task.id === id) {
+      
+      return {
+        ...task,name:taskName
+      }
+   
+
+    }
+    return task
+   
+  });
+  localStorage.setItem("itemsStore",JSON.stringify(tasks)) 
+  console.log(tasks)
+}
+
+
+const deleteTask=(id:number)=>{
+  _.remove(tasks, (task)=>task?.id==id)
+  localStorage.setItem("itemsStore",JSON.stringify(tasks)) 
+}
+
+useEffect(() => {
+  // Check if localStorage is available
+  if (typeof window !== 'undefined' && window.localStorage) {
+    let itemLocalStore = localStorage.getItem("itemsStore");
+    if (itemLocalStore) {
+      let t = JSON.parse(itemLocalStore);
+      setItemStore(t);
+      console.log(itemStore)
+    }
+  }
+},[itemStore]);
+
+  // const taskStore=localStorage.setItem ("taskStore",JSON.stringify(tasks))
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
+    <main className="flex min-h-screen  ">
+      <div className="lg:w-[40%]  relative shadow-[0px_0px_10px_0px_#00000026]">
+        <header className=" bg-[#3556AB] shadow-[0px_0px_10px_0px_#00000026] lg:min-h-[130px] p-5 z-10 ">
+          <section className="flex gap-x-4">
             <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+              alt="pfp"
+              src="/pfp.png"
+              className="max-h-14"
+              width={50}
+              height={50}
             />
-          </a>
+            <div>
+              <p className="font-[500] text-white ">Hello , John</p>
+              <p className="italic text-[#FFFFFF] text-3xl font-[100] opacity-30 leading-8 lg: w-[75%]">
+                What are your plans for today?
+              </p>
+            </div>
+          </section>
+        </header>
+
+        <div className=" bg-[#CDE53D]  lg:min-h-[130px] ps-5 pe-5 ">
+          <section className="flex justify-between items-center">
+            <Image
+              alt="pfp"
+              src="/cup.png"
+              className="max-h-14 pt-5"
+              width={50}
+              height={50}
+            />
+            <div>
+              <p className=" text-[#071D55] font-bold pt-5 ">
+                Go Pro Upgrade Now
+              </p>
+            </div>
+            <p className="bg-[#071D55] text-[#F2C94C]  lg: h-[71px] lg:w-[66px] flex justify-center items-center">
+              $1
+            </p>
+          </section>
+        </div>
+
+        <ul className=" min-h-[60%] ">
+
+  {
+
+itemStore?.map(task=>(
+
+  <li key={task?.id}>
+  <div className="   lg:min-h-24 p-5  shadow-lg shadow-[#E7E7E7] max-w-[99%] mx-auto">
+    <section className="flex justify-between items-center">
+     
+     {task?.status=="complete"?(
+     <div
+     onClick={()=>{
+      updateTaskStat(task?.id)
+     }}
+     
+     className="rounded-full w-[30px] h-[30px] border border-[#071D55] cursor-pointer">
+
+     </div>
+     ):(
+      <Image
+      onClick={()=>{
+        updateTaskStat(task?.id)
+       }}
+        alt="pfp"
+        src="/check.svg"
+        className="max-h-14 pt-5 cursor-pointer"
+        width={30}
+        height={30}
+      />
+
+     )
+     
+     }
+      
+     
+      <div>
+        <p className=" text-[#8D8D8D] font-bold  ">
+          {task?.name}
+        </p>
+      </div>
+      <p
+      onClick={()=>{
+        setTaskName(task.name)
+        setId(task?.id)
+      }}
+        className="border-[#071D55] border rounded 
+  hover:bg-[#071D55] hover:text-white hover:transition cursor-pointer
+  lg:p-2 flex justify-center align-middle place-content-center text-[#071D55]"
+      >
+        Edit
+      </p>
+    </section>
+  </div>
+</li>
+))
+            // tasks?.map((task)=>(
+       
+            
+            // ))
+            }
+
+          
+        </ul>
+        <div className="rounded-full w-14 h-14 text-3xl z-10 text-white border items-center flex justify-center text-center bg-[#071D55] top-[92%] left-[90%] absolute ">
+          +
         </div>
       </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <div className=" min-w-[60%] ">
+        <div className="min-h-[92%]">
+          <header className=" bg-[#3556AB] shadow shadow-[#000000] lg:min-h-[130px] ">
+            <section className="flex justify-center items-center  ">
+              <p className="font-[500] text-white  text-center my-auto p-7">
+                {
+                  editMode?"Edit task":" Add task"
+                }
+                
+              </p>
+            </section>
+          </header>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+          <div className="w-[90%] m-auto">
+            <p className="text-[#000000] font-normal pt-6">Task Name</p>
+        
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+<input 
+onChange={(e)=>{
+  setTaskName(e.target.value)
+}}
+value={taskName}
+type="text" className="border border-[#CBCBCB] rounded-lg min-h-4 p-3 w-[100%] text-[#0D2972] items-center pt-3" />           
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+            
+            
+              
+            
+          </div>
+        </div>
+        <section className="w-[90%] m-auto space-x-6">
+          <button 
+          onClick={()=>{
+           
+          }}
+          className="border-[#551d1d] border  bg-[#AB3535] rounded-lg min-w-[25%] hover:transition hover:delay-100 hover:bg-[#572525] min-h-14 text-white">
+            Delete
+          </button>{" "}
+          <button
+          onClick={()=>{
+            updateTask(id)
+          }}
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+            className="bg-[#3556AB] 
+          hover:transition hover:delay-100 hover:bg-[#19243f]
+          
+          border border-[#0D2972] min-w-[60%] min-h-14 rounded-lg text-white"
+          >
+            Save
+          </button>
+        </section>
       </div>
     </main>
   );
